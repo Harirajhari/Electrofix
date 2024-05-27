@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
         res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 3600000 }); // 1 hour
 
         
-        res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({ message: "Login successful", token});
     } catch (error) {
         console.error("Error during login:", error);
         res.status(500).json({ message: "Internal server error" });
@@ -76,7 +76,6 @@ router.put("/update", middleware, async (req, res) => {
     const { name, username, email, mobile } = req.body;
 
     const userId = req.user.id
-    console.log(userId);
 
 
     if (!name || !username || !email || !mobile) {
@@ -114,6 +113,22 @@ router.delete("/delete", middleware, async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+
+router.get("/details", middleware, async (req, res) => {
+    const userId = req.user.id;
+  
+    try {
+      const user = await UserSchema.findById(userId, 'name username email mobile joined');
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+  
 
 
 module.exports = router;

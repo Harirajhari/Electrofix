@@ -25,15 +25,23 @@ router.post('/:postId', middleware, async (req, res) => {
 });
 
 
-router.put('/:replyId',middleware, async (req, res) => {
+router.put('/:replyId', middleware, async (req, res) => {
     const { replyId } = req.params;
     const { content } = req.body;
+    const userId = req.user.id;
 
     try {
-        const updatedReply = await Reply.findByIdAndUpdate(replyId, { content }, { new: true });
-        if (!updatedReply) {
+        const reply = await Reply.findById(replyId);
+        if (!reply) {
             return res.status(404).json({ message: 'Reply not found' });
         }
+
+        // Check if the user is the author of the reply
+        if (reply.user.toString() !== userId) {
+            return res.status(403).json({ message: 'You are not authorized to edit this reply' });
+        }
+
+        const updatedReply = await Reply.findByIdAndUpdate(replyId, { content }, { new: true });
         res.status(200).json({ message: 'Reply updated successfully', reply: updatedReply });
     } catch (error) {
         console.error('Error updating reply:', error);
@@ -41,14 +49,22 @@ router.put('/:replyId',middleware, async (req, res) => {
     }
 });
 
-router.delete('/:replyId',middleware, async (req, res) => {
+router.delete('/:replyId', middleware, async (req, res) => {
     const { replyId } = req.params;
+    const userId = req.user.id;
 
     try {
-        const reply = await Reply.findByIdAndDelete(replyId);
+        const reply = await Reply.findById(replyId);
         if (!reply) {
             return res.status(404).json({ message: 'Reply not found' });
         }
+
+        // Check if the user is the author of the reply
+        if (reply.user.toString() !== userId) {
+            return res.status(403).json({ message: 'You are not authorized to delete this reply' });
+        }
+
+        await reply.delete();
 
         // Remove the reply from the post's replies array
         await UserPost.updateMany({}, { $pull: { replies: replyId } });
@@ -61,7 +77,8 @@ router.delete('/:replyId',middleware, async (req, res) => {
 });
 
 
-router.get('/:postId/replies', async (req, res) => {
+
+router.get('/:postId', async (req, res) => {
     const { postId } = req.params;
 
     try {

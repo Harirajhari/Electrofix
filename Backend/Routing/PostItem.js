@@ -13,6 +13,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 router.post('/add', middleware, upload.single('image'), async (req, res) => {
     const { title, question } = req.body;
+    const user = req.user.id;
     let tags;
 
     try {
@@ -48,7 +49,7 @@ router.post('/add', middleware, upload.single('image'), async (req, res) => {
     }
 
     try {
-        const newPost = new UserPostSChema({ title, question, image: imageUrl, tags });
+        const newPost = new UserPostSChema({user, title, question, image: imageUrl, tags });
         await newPost.save();
         res.status(201).json({ message: 'Post created successfully', post: newPost });
     } catch (error) {
@@ -57,16 +58,21 @@ router.post('/add', middleware, upload.single('image'), async (req, res) => {
     }
 });
 
-router.put('/update/:id', middleware, async (req, res) => {
+router.put('/update/:id', middleware, upload.single('image'), async (req, res) => {
     const { id } = req.params;
-    const { title, question, image, tags } = req.body;
+    const { title, question, tags } = req.body;
+    const image = req.file;
 
-    if (!title || !question || !tags || !Array.isArray(tags)) {
+    if (!title || !question || !tags || !Array.isArray(tags.split(','))) {
         return res.status(400).json({ message: "Title, question, and tags are required and tags should be an array." });
     }
 
     try {
-        const updatedPost = await UserPostSChema.findByIdAndUpdate(id, { title, question, image, tags }, { new: true });
+        const updatedPost = await UserPostSChema.findByIdAndUpdate(
+            id,
+            { title, question, image: image?.path, tags: tags.split(',') },
+            { new: true }
+        );
         if (!updatedPost) {
             return res.status(404).json({ message: "Post not found" });
         }
@@ -113,13 +119,29 @@ router.get('/filter', async (req, res) => {
 router.get('/all', async (req, res) => {
     try {
         const posts = await UserPostSChema.find({});
-        console.log(posts);
         res.status(200).json({ posts });
     } catch (error) {
         console.error('Error fetching posts:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
+
+//User post Items
+router.get("/user/posts", middleware, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const posts = await UserPostSChema.find({ user : userId });
+        if (!posts) {
+            return res.status(404).json({ message: "No posts found" });
+        }
+
+        res.status(200).json(posts);
+    } catch (error) {
+        console.error("Error fetching user posts:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+})
 
 
 module.exports = router;

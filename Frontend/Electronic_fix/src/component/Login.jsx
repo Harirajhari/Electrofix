@@ -1,8 +1,9 @@
 import axios from 'axios';
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+    const navigate = useNavigate();
     const [isSignUp, setIsSignUp] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const Login = () => {
                 const loginData = { email: formData.email, password: formData.password };
                 const response = await axios.post('http://localhost:3000/user/login', loginData, { withCredentials: true });
                 console.log('Login Response:', response.data);
-                // useNavigate("/dashboard");
+                navigate("/dashboard");
                 // Handle successful login (e.g., save token, redirect)
             }
         } catch (error) {
