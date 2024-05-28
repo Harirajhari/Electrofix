@@ -5,6 +5,7 @@ import Login from "./component/Login";
 import Dashboard from './component/Dashboard';
 import Profile from "./component/Profile";
 import AskQuestion from './component/AskQuestion';
+import PostDetail from './component/PostDetail';
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/" element={<GetStartedPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/post/:postId" element={<PostDetail />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/ask-question" element={<AskQuestion />} />
             </Routes>

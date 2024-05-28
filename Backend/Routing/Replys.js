@@ -14,7 +14,6 @@ router.post('/:postId', middleware, async (req, res) => {
         const newReply = new Reply({ user: userId, content });
         await newReply.save();
 
-        // Add the reply to the post's replies array
         await UserPost.findByIdAndUpdate(postId, { $push: { replies: newReply._id } });
 
         res.status(201).json({ message: 'Reply created successfully', reply: newReply });
@@ -80,6 +79,7 @@ router.delete('/:replyId', middleware, async (req, res) => {
 
 router.get('/:postId', async (req, res) => {
     const { postId } = req.params;
+    console.log("hello");
 
     try {
         const post = await UserPost.findById(postId).populate('replies');

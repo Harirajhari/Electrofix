@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const user = require("../Schema/UserSchema")
 const UserPostSChema = require("../Schema/userPost")
 const middleware = require("../middleware/Auth");
 const multer = require('multer');
@@ -122,6 +123,21 @@ router.get('/all', async (req, res) => {
         res.status(200).json({ posts });
     } catch (error) {
         console.error('Error fetching posts:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+//Post Id
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const post = await UserPostSChema.findById(id).populate('replies');
+        if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+        }
+        res.status(200).json({ post });
+    } catch (error) {
+        console.error('Error fetching post:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
