@@ -82,7 +82,7 @@ router.get('/:postId', async (req, res) => {
     console.log("hello");
 
     try {
-        const post = await UserPost.findById(postId).populate('replies');
+        const post = await UserPost.findById(postId);
         if (!post) {
             return res.status(404).json({ message: 'Post not found' });
         }

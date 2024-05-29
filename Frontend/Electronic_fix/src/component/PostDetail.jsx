@@ -80,7 +80,8 @@ const PostDetail = () => {
                 {post.replies.map(reply => (
                   <li key={reply._id} className="mb-4">
                     <div className="bg-gray-100 p-4 rounded-lg shadow-md">
-                      <p className="text-gray-700">{reply.content}</p>
+                      <p className="text-gray-700">Experts : {reply.content}</p>
+                      
                     </div>
                   </li>
                 ))}

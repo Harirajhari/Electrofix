@@ -147,7 +147,7 @@ router.get("/user/posts", middleware, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        const posts = await UserPostSChema.find({ user : userId });
+        const posts = await UserPostSChema.find({ user : userId }).populate('replies');
         if (!posts) {
             return res.status(404).json({ message: "No posts found" });
         }

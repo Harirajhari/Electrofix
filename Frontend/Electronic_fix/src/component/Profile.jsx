@@ -25,6 +25,8 @@ const Profile = () => {
       }
     };
 
+
+
     const fetchUserPosts = async () => {
       try {
         const response = await axios.get('http://localhost:3000/item/user/posts', { withCredentials: true });
@@ -108,7 +110,7 @@ const Profile = () => {
               <div key={post._id} className="bg-gray-100 p-4 rounded relative">
                 {editingPost && editingPost._id === post._id ? (
                   <div>
-                    <input 
+                    <input
                       className="border p-2 mb-2 w-full"
                       value={editedTitle}
                       onChange={(e) => setEditedTitle(e.target.value)}
@@ -158,6 +160,23 @@ const Profile = () => {
                     >
                       Delete
                     </button>
+                    <button className='absolute top-16 right-6 bg-grey  text-white px-4 py-2 rounded'>
+                      <img src="https://www.gstatic.com/lamda/images/gemini_sparkle_v002_d4735304ff6292a690345.svg" alt="Gemini AI" width="24" height="24" />
+                    </button>
+
+
+
+                    <h5 className="font-semibold mt-4">Replies</h5>
+                    {post.replies && post.replies.length > 0 ? (
+                      <ul className="ml-4">
+                        {post.replies.map(reply => (
+                          <li key={reply._id} className="bg-white p-2 rounded mb-2">
+                            <p className="text-gray-700"> Experts : {reply.content}</p>                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>No replies yet.</p>
+                    )}
                   </div>
                 )}
               </div>
